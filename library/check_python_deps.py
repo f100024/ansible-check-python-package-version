@@ -245,7 +245,8 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             dependencies=dict(required=True, type=list),
-            log=dict(type=str)))
+            log=dict(type=str)),
+        supports_check_mode=True)
     params = module.params
     dependencies = params['dependencies']
     log = params['log']
