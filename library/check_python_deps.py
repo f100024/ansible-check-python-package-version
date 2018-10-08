@@ -158,6 +158,16 @@ def get_results(deps_reqs):
                                    real=real_version))
     return sorted(retlist)
 
+def find_file(configured_folder, file_path):
+
+    if os.path.isfile(file_path):
+        return file_path
+
+    if os.path.isfile(os.path.join(configured_folder, file_path)):
+        return os.path.join(configured_folder, file_path)
+
+    return False
+
 
 def open_file(file_path):
 
@@ -167,11 +177,21 @@ def open_file(file_path):
     """
 
     retlist = []
+
+    dirname_file_path = os.path.dirname(file_path)
+
     with open(file_path, 'r') as tf:
         fi = tf.readlines()
+
     for i in fi:
         if i.startswith('-r'):
-            tlist = open_file(i.replace('-r', '').strip())
+            found_path = find_file(dirname_file_path, i.replace('-r','').strip())
+
+            if not found_path:
+                print('File {} does not exist'.format(i))
+                continue
+
+            tlist = open_file(found_path)
             retlist.extend(tlist)
         else:
             tstr = i.strip()
@@ -188,8 +208,9 @@ def find_all_deps(list_file_path):
 
     temp_list = []
     for item_file in list_file_path:
+
         if not os.path.isfile(item_file):
-            print('File {}  does not exists'.format(item_file))
+            print('File {}  does not exist'.format(item_file))
             continue
         # Open files and create list of deps
         list_deps = open_file(item_file)
