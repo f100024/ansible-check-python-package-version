@@ -2,6 +2,19 @@
 # -*- coding: utf-8 -*-
 # Copyright: (c) 2018, f100024.
 
+import json
+import os
+import re
+
+# Ansible imports
+from ansible.module_utils.basic import AnsibleModule
+
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
+
+
 DOCUMENTATION = '''
 ---
 module: check_python_deps
@@ -37,20 +50,6 @@ EXAMPLES = '''
       log: "{{ playbook_dir }}/log.txt"
 '''
 
-# Ansible imports
-from ansible.module_utils.basic import AnsibleModule
-
-# Python 2, 3 compatible
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
-
-# Common imports
-import os
-import json
-import re
-
 
 def get_real_version(package_name):
 
@@ -62,7 +61,7 @@ def get_real_version(package_name):
     """
 
     result = 'git:// in package_name'
-    if not 'git://' in package_name:
+    if 'git://' not in package_name:
         request_str = 'https://pypi.org/pypi/{}/json'.format(package_name)
         r = urlopen(request_str)
         result = '{request_str} - {status_code}'.format(request_str=request_str, status_code=r.code)
@@ -144,8 +143,6 @@ def get_results(deps_reqs):
         real_version = get_real_version(item)
         retdict[item]['real'] = real_version
         csymbol = retdict[item]['csymbol']
-
-
         if compare(current_version, real_version, csymbol):
             retlist.append('(+) {package}: current: {current} real: {real}'
                            .format(package=item,
@@ -157,6 +154,7 @@ def get_results(deps_reqs):
                                    current=current_version,
                                    real=real_version))
     return sorted(retlist)
+
 
 def find_file(configured_folder, file_path):
 
@@ -185,7 +183,8 @@ def open_file(file_path):
 
     for i in fi:
         if i.startswith('-r'):
-            found_path = find_file(dirname_file_path, i.replace('-r','').strip())
+            found_path = \
+                find_file(dirname_file_path, i.replace('-r', '').strip())
 
             if not found_path:
                 print('File {} does not exist'.format(i))
@@ -254,9 +253,8 @@ def main():
     result_list = get_results(parsed_deps_lists)
     if log:
         save_log(result_list, log)
-    module.exit_json(msg='Finished', text='\n'+'\n'.join(result_list))
+    module.exit_json(msg='Finished', text='\n' + '\n'.join(result_list))
 
 
 if __name__ == '__main__':
     main()
-
