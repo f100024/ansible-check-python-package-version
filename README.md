@@ -28,6 +28,9 @@ dependencies - set path to files with requiremnents list;
 [-] Django: local: 1.10.6 latest: 2.1.1
 ```
 In square brackets:
+```bash
 [+] Local version and PyPi versions are equal.
 [-] Local version and PyPi versiions are not equal.
+```
+
 
