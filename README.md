@@ -9,7 +9,6 @@ Add module to directory
 ```bash
 library/check_python_package_version.py
 ```
-
 ## How to add to playbook
 
 ```yaml
@@ -30,4 +29,3 @@ dependencies - set path to files with requiremnents list;
 In square brackets:
 [+] Local version and PyPi versions are equal.
 [-] Local version and PyPi versiions are not equal.
-
